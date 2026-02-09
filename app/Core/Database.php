@@ -7,7 +7,6 @@ namespace App\Core;
 use PDO;
 use PDOException;
 use RuntimeException;
-use Dotenv\Dotenv;
 
 class Database
 {
@@ -21,10 +20,7 @@ class Database
 
         $rootPath = dirname(__DIR__, 2);
 
-        if (file_exists($rootPath . '/.env')) {
-            $dotenv = Dotenv::createImmutable($rootPath);
-            $dotenv->load();
-        }
+        self::loadEnv($rootPath);
 
         $host = $_ENV['DB_HOST'] ?? '127.0.0.1';
         $port = $_ENV['DB_PORT'] ?? '3306';
@@ -44,6 +40,47 @@ class Database
         }
 
         return self::$connection;
+    }
+
+    /**
+     * Very small .env loader to avoid requiring vlucas/phpdotenv.
+     *
+     * Supports KEY=VALUE lines, ignores comments and empty lines,
+     * and strips optional surrounding quotes.
+     */
+    private static function loadEnv(string $rootPath): void
+    {
+        $envFile = $rootPath . '/.env';
+
+        if (!is_file($envFile)) {
+            return;
+        }
+
+        $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        if ($lines === false) {
+            return;
+        }
+
+        foreach ($lines as $line) {
+            $trimmed = trim($line);
+            if ($trimmed === '' || str_starts_with($trimmed, '#')) {
+                continue;
+            }
+
+            [$name, $value] = array_pad(explode('=', $trimmed, 2), 2, '');
+            $name = trim($name);
+            $value = trim($value);
+
+            // Strip surrounding single or double quotes.
+            if ((str_starts_with($value, '"') && str_ends_with($value, '"')) ||
+                (str_starts_with($value, "'") && str_ends_with($value, "'"))) {
+                $value = substr($value, 1, -1);
+            }
+
+            if ($name !== '') {
+                $_ENV[$name] = $value;
+            }
+        }
     }
 }
 

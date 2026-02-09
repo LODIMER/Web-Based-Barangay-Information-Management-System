@@ -17,5 +17,19 @@ class User extends Model
         $result = $stmt->fetch();
         return $result ?: null;
     }
+
+    public function createUser(string $username, string $password, string $fullName): bool
+    {
+        $hash = password_hash($password, PASSWORD_DEFAULT);
+        $stmt = $this->db->prepare(
+            "INSERT INTO {$this->table} (username, password, full_name) VALUES (:username, :password, :full_name)"
+        );
+
+        return $stmt->execute([
+            'username' => $username,
+            'password' => $hash,
+            'full_name' => $fullName,
+        ]);
+    }
 }
 

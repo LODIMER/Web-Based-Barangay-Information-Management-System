@@ -5,8 +5,22 @@
 
 <div class="card shadow-sm border-0">
     <div class="card-body p-0">
+        <div class="d-flex gap-2 align-items-center p-3 pb-2">
+            <label for="residentSearch" class="form-label mb-0 text-muted small">Search</label>
+            <input
+                id="residentSearch"
+                type="search"
+                class="form-control form-control-sm table-filter-input"
+                placeholder="Type a name, address, sex, or date…"
+                autocomplete="off"
+                data-table-filter="residents"
+            >
+            <button type="button" class="btn btn-outline-secondary btn-sm" data-table-filter-clear="residents">
+                Clear
+            </button>
+        </div>
         <div class="table-responsive">
-            <table class="table table-hover mb-0 align-middle">
+            <table class="table table-hover mb-0 align-middle" data-table="residents">
                 <thead class="table-light">
                 <tr>
                     <th>#</th>
@@ -19,7 +33,7 @@
                 <tbody>
                 <?php if (!empty($residents)): ?>
                     <?php foreach ($residents as $resident): ?>
-                        <tr>
+                        <tr data-row>
                             <td><?= (int) $resident['id'] ?></td>
                             <td><?= htmlspecialchars($resident['last_name'] . ', ' . $resident['first_name']) ?></td>
                             <td><?= htmlspecialchars($resident['sex']) ?></td>

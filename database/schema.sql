@@ -1,10 +1,4 @@
--- Database schema for Web-Based Barangay Information Management System
-
-CREATE DATABASE IF NOT EXISTS barangay_db
-  CHARACTER SET utf8mb4
-  COLLATE utf8mb4_unicode_ci;
-
-USE barangay_db;
+USE barangay_database;
 
 CREATE TABLE IF NOT EXISTS users (
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
