@@ -57,5 +57,20 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     setupTableFilter("residents");
+
+    // Simple navbar notification dropdown toggle (UI only for now).
+    const toggle = document.querySelector("[data-notif-toggle]");
+    const dropdown = document.getElementById("notifDropdown");
+
+    if (toggle && dropdown) {
+      toggle.addEventListener("click", (event) => {
+        event.stopPropagation();
+        dropdown.classList.toggle("show");
+      });
+
+      document.addEventListener("click", () => {
+        dropdown.classList.remove("show");
+      });
+    }
   });
 })();

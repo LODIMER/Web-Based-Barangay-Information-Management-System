@@ -15,6 +15,15 @@ class AyudaRequestController extends Controller
      */
     public function create(): void
     {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        if (empty($_SESSION['user_id'])) {
+            // Only logged-in residents/officials may access this page.
+            $this->redirect('/login');
+        }
+
         $this->view('ayuda/request_form', [
             'title' => 'Request Ayuda',
         ]);

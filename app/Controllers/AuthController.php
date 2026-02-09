@@ -45,9 +45,9 @@ class AuthController extends Controller
 
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['username'];
+        $_SESSION['role'] = $user['role'] ?? 'resident';
 
-        header('Location: ' . $this->basePath() . '/');
-        exit;
+        $this->redirect('/');
     }
 
     public function registerForm(): void
@@ -111,7 +111,8 @@ class AuthController extends Controller
             return;
         }
 
-        if (!$userModel->createUser($username, $password, $fullName)) {
+        // New self-registered accounts are residents by default.
+        if (!$userModel->createUser($username, $password, $fullName, 'resident')) {
             $this->view('auth/register', [
                 'title' => 'Register',
                 'errors' => ['Failed to create account. Please try again.'],
@@ -126,23 +127,14 @@ class AuthController extends Controller
         }
 
         $_SESSION['success'] = 'Account created. You can now log in.';
-        header('Location: ' . $this->basePath() . '/login');
-        exit;
+        $this->redirect('/login');
     }
 
     public function logout(): void
     {
         session_start();
         session_destroy();
-        header('Location: ' . $this->basePath() . '/login');
-        exit;
-    }
-
-    private function basePath(): string
-    {
-        $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
-        $basePath = rtrim(str_replace('\\', '/', dirname($scriptName)), '/');
-        return ($basePath === '' || $basePath === '/') ? '' : $basePath;
+        $this->redirect('/login');
     }
 }
 

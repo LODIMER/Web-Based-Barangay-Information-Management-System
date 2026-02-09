@@ -126,3 +126,75 @@ body {
     color: var(--bims-text-muted);
 }
 
+/* Navbar icons / notifications */
+.nav-icon-btn {
+    cursor: pointer;
+}
+
+.nav-bell-icon {
+    font-size: 1.2rem;
+    line-height: 1;
+}
+
+.nav-badge-dot {
+    position: absolute;
+    top: 0;
+    right: -2px;
+    width: 9px;
+    height: 9px;
+    border-radius: 999px;
+    background-color: #facc15;
+    border: 2px solid #0d6efd;
+}
+
+.notif-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0.75rem;
+    width: 280px;
+    background-color: #ffffff;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    margin-top: 0.35rem;
+    z-index: 1040;
+    display: none;
+}
+
+.notif-dropdown.show {
+    display: block;
+}
+
+.calendar-grid {
+    border-radius: 0.75rem;
+    border: 1px solid var(--bims-border-subtle);
+    overflow: hidden;
+}
+
+.calendar-row {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.calendar-header .calendar-cell {
+    background-color: var(--bims-surface-alt);
+}
+
+.calendar-cell {
+    min-height: 52px;
+    border-right: 1px solid var(--bims-border-subtle);
+    border-bottom: 1px solid var(--bims-border-subtle);
+    padding: 0.35rem 0.4rem;
+}
+
+.calendar-cell:last-child {
+    border-right: none;
+}
+
+.calendar-row:last-child .calendar-cell {
+    border-bottom: none;
+}
+
+.calendar-date {
+    font-weight: 600;
+}
+

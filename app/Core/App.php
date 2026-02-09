@@ -12,10 +12,13 @@ class App
 
         // Define routes
         $router->get('/', [\App\Controllers\DashboardController::class, 'index']);
+        $router->get('/profile', [\App\Controllers\ProfileController::class, 'show']);
+        $router->post('/profile', [\App\Controllers\ProfileController::class, 'update']);
         $router->get('/residents', [\App\Controllers\ResidentController::class, 'index']);
         $router->get('/households', [\App\Controllers\HouseholdController::class, 'index']);
         $router->get('/officials', [\App\Controllers\OfficialController::class, 'index']);
         $router->get('/ayuda/request', [\App\Controllers\AyudaRequestController::class, 'create']);
+        $router->get('/schedule', [\App\Controllers\ScheduleController::class, 'index']);
         $router->get('/login', [\App\Controllers\AuthController::class, 'loginForm']);
         $router->post('/login', [\App\Controllers\AuthController::class, 'login']);
         $router->get('/register', [\App\Controllers\AuthController::class, 'registerForm']);

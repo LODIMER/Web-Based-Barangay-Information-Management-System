@@ -5,6 +5,11 @@ CREATE TABLE IF NOT EXISTS users (
   username VARCHAR(50) NOT NULL UNIQUE,
   password VARCHAR(255) NOT NULL,
   full_name VARCHAR(100) NOT NULL,
+  contact_number VARCHAR(20) NULL,
+  address VARCHAR(255) NULL,
+  id_document_path VARCHAR(255) NULL,
+  is_verified TINYINT(1) NOT NULL DEFAULT 0,
+  role ENUM('resident', 'official', 'admin') NOT NULL DEFAULT 'resident',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -37,11 +42,12 @@ CREATE TABLE IF NOT EXISTS officials (
 );
 
 -- Seed demo admin user (password: admin123)
-INSERT INTO users (username, password, full_name)
+INSERT INTO users (username, password, full_name, role)
 VALUES (
   'admin',
   '$2y$10$JvPRQnqBZ4QuvW3vA3sYGejh9E3RIlnJrped1IovnHgwlHGawEqnW',
-  'System Administrator'
+  'System Administrator',
+  'admin'
 )
 ON DUPLICATE KEY UPDATE username = username;
 
