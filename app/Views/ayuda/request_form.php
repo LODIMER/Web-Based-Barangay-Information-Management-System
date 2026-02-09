@@ -2,35 +2,67 @@
     <div class="col-lg-8 col-xl-7">
         <div class="card shadow-sm border-0">
             <div class="card-body p-4">
-                <h1 class="h4 mb-3">Request Ayuda</h1>
-                <p class="text-muted mb-4 small">
-                    Fill out the form below to request assistance from the barangay.
+                <?php $role = $role ?? 'resident'; ?>
+                <h1 class="h4 mb-1">
+                    <?= ($role === 'official' || $role === 'admin') ? 'Add Ayuda Schedule' : 'Request Ayuda' ?>
+                </h1>
+                <p class="text-muted mb-3 small">
+                    <?= ($role === 'official' || $role === 'admin')
+                        ? 'Create a new ayuda request and assign a schedule.'
+                        : 'Fill out the form below to request assistance from the barangay.' ?>
                 </p>
 
-                <form>
+                <?php if (!empty($success)): ?>
+                    <div class="alert alert-success py-2 small"><?= htmlspecialchars($success) ?></div>
+                <?php endif; ?>
+
+                <?php if (!empty($errors)): ?>
+                    <div class="alert alert-danger py-2 small">
+                        <ul class="mb-0">
+                            <?php foreach ($errors as $message): ?>
+                                <li><?= htmlspecialchars($message) ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+
+                <form method="post" action="<?= $baseUrl ?>/ayuda/request">
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label for="request_type" class="form-label mb-1 small fw-semibold text-muted text-uppercase">
                                 Request Type *
                             </label>
-                            <select id="request_type" class="form-select">
-                                <option selected disabled>Select type of assistance</option>
-                                <option>Financial Assistance</option>
-                                <option>Medical / Health</option>
-                                <option>Food Packs / Relief Goods</option>
-                                <option>Document Processing</option>
-                                <option>Legal Advice</option>
-                                <option>Other</option>
+                            <select id="request_type" name="request_type" class="form-select" required>
+                                <option value="" disabled <?= empty($old['request_type'] ?? '') ? 'selected' : '' ?>>
+                                    Select type of assistance
+                                </option>
+                                <?php
+                                $types = [
+                                    'Financial Assistance',
+                                    'Medical / Health',
+                                    'Food Packs / Relief Goods',
+                                    'Document Processing',
+                                    'Legal Advice',
+                                    'Other',
+                                ];
+                                foreach ($types as $type):
+                                    $selected = (($old['request_type'] ?? '') === $type) ? 'selected' : '';
+                                ?>
+                                    <option <?= $selected ?>><?= $type ?></option>
+                                <?php endforeach; ?>
                             </select>
                         </div>
                         <div class="col-md-6">
                             <label for="urgency" class="form-label mb-1 small fw-semibold text-muted text-uppercase">
                                 Urgency Level *
                             </label>
-                            <select id="urgency" class="form-select">
-                                <option>Low - Can wait</option>
-                                <option selected>Medium - Needed soon</option>
-                                <option>High - Urgent</option>
+                            <select id="urgency" name="urgency" class="form-select">
+                                <?php
+                                $urgency = $old['urgency'] ?? 'medium';
+                                ?>
+                                <option value="low" <?= $urgency === 'low' ? 'selected' : '' ?>>Low - Can wait</option>
+                                <option value="medium" <?= $urgency === 'medium' ? 'selected' : '' ?>>Medium - Needed soon</option>
+                                <option value="high" <?= $urgency === 'high' ? 'selected' : '' ?>>High - Urgent</option>
                             </select>
                         </div>
                         <div class="col-12">
@@ -39,30 +71,27 @@
                             </label>
                             <textarea
                                 id="description"
+                                name="description"
                                 class="form-control"
                                 rows="4"
-                                placeholder="Please describe your situation and what specific help you need..."
-                            ></textarea>
+                                placeholder="Please describe the situation and what specific help is needed..."
+                                required
+                            ><?= htmlspecialchars($old['description'] ?? '') ?></textarea>
                         </div>
                         <div class="col-md-6">
                             <label for="preferred_date" class="form-label mb-1 small fw-semibold text-muted text-uppercase">
                                 Preferred Date
                             </label>
-                            <input type="date" id="preferred_date" class="form-control">
-                            <div class="form-text small">
-                                Optional preference for when you can receive help.
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="contact_number" class="form-label mb-1 small fw-semibold text-muted text-uppercase">
-                                Contact Number *
-                            </label>
                             <input
-                                type="tel"
-                                id="contact_number"
+                                type="date"
+                                id="preferred_date"
+                                name="preferred_date"
                                 class="form-control"
-                                placeholder="e.g. 09171234567"
+                                value="<?= htmlspecialchars($old['preferred_date'] ?? '') ?>"
                             >
+                            <div class="form-text small">
+                                Optional preference for when help can be given.
+                            </div>
                         </div>
                     </div>
 
@@ -75,8 +104,8 @@
                         </ul>
                     </div>
 
-                    <button type="button" class="btn btn-success w-100 fw-semibold">
-                        Submit Request
+                    <button type="submit" class="btn btn-success w-100 fw-semibold">
+                        <?= ($role === 'official' || $role === 'admin') ? 'Save Ayuda & Schedule' : 'Submit Request' ?>
                     </button>
                 </form>
             </div>

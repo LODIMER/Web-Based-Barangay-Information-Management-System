@@ -18,11 +18,16 @@ class App
         $router->get('/households', [\App\Controllers\HouseholdController::class, 'index']);
         $router->get('/officials', [\App\Controllers\OfficialController::class, 'index']);
         $router->get('/ayuda/request', [\App\Controllers\AyudaRequestController::class, 'create']);
+        $router->post('/ayuda/request', [\App\Controllers\AyudaRequestController::class, 'store']);
         $router->get('/schedule', [\App\Controllers\ScheduleController::class, 'index']);
         $router->get('/login', [\App\Controllers\AuthController::class, 'loginForm']);
         $router->post('/login', [\App\Controllers\AuthController::class, 'login']);
+        $router->get('/login/official', [\App\Controllers\AuthController::class, 'officialLoginForm']);
+        $router->post('/login/official', [\App\Controllers\AuthController::class, 'officialLogin']);
         $router->get('/register', [\App\Controllers\AuthController::class, 'registerForm']);
         $router->post('/register', [\App\Controllers\AuthController::class, 'register']);
+        $router->get('/register/official', [\App\Controllers\AuthController::class, 'officialRegisterForm']);
+        $router->post('/register/official', [\App\Controllers\AuthController::class, 'officialRegister']);
         $router->get('/logout', [\App\Controllers\AuthController::class, 'logout']);
 
         $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';

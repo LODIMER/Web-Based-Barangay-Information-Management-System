@@ -1,5 +1,10 @@
 <?php
 /** @var array $user */
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+$role = $_SESSION['role'] ?? 'resident';
+$residentNumber = $user['resident_number'] ?? '';
 $contact = $user['contact_number'] ?? '';
 $address = $user['address'] ?? '';
 $idPath = $user['id_document_path'] ?? null;
@@ -38,6 +43,23 @@ $isVerified = !empty($user['is_verified']);
                             value="<?= htmlspecialchars($user['full_name'] ?? '') ?>"
                         >
                     </div>
+
+                    <?php if ($role === 'resident'): ?>
+                        <div class="mb-3">
+                            <label for="resident_number" class="form-label fw-semibold">Resident Number</label>
+                            <input
+                                type="text"
+                                id="resident_number"
+                                name="resident_number"
+                                class="form-control"
+                                placeholder="e.g. RES-001"
+                                value="<?= htmlspecialchars($residentNumber) ?>"
+                            >
+                            <div class="form-text">
+                                This is your unique resident account number.
+                            </div>
+                        </div>
+                    <?php endif; ?>
 
                     <div class="mb-3">
                         <label for="contact_number" class="form-label fw-semibold">Contact Number</label>

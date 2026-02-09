@@ -25,11 +25,13 @@ $role = $_SESSION['role'] ?? 'resident';
                         <a class="nav-link" href="<?= $baseUrl ?>/profile">My Profile</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= $baseUrl ?>/ayuda/request">Request Ayuda</a>
+                        <a class="nav-link" href="<?= $baseUrl ?>/ayuda/request">
+                            <?= ($role === 'official' || $role === 'admin') ? 'Add Ayuda' : 'Request Ayuda' ?>
+                        </a>
                     </li>
                     <?php if ($role === 'official' || $role === 'admin'): ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= $baseUrl ?>/schedule">My Schedule</a>
+                            <a class="nav-link" href="<?= $baseUrl ?>/schedule">Schedule</a>
                         </li>
                     <?php endif; ?>
                     <?php if ($role === 'official' || $role === 'admin'): ?>

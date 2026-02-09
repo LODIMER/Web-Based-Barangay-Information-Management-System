@@ -51,6 +51,7 @@ class ProfileController extends Controller
         }
 
         $fullName = trim($_POST['full_name'] ?? '');
+        $residentNumber = trim($_POST['resident_number'] ?? ($user['resident_number'] ?? ''));
         $contact = trim($_POST['contact_number'] ?? '');
         $address = trim($_POST['address'] ?? '');
 
@@ -96,6 +97,7 @@ class ProfileController extends Controller
                 'title' => 'My Profile',
                 'user' => array_merge($user, [
                     'full_name' => $fullName,
+                    'resident_number' => $residentNumber,
                     'contact_number' => $contact,
                     'address' => $address,
                     'id_document_path' => $idPath,
@@ -106,7 +108,7 @@ class ProfileController extends Controller
             return;
         }
 
-        $userModel->updateProfile($userId, $fullName, $contact, $address, $idPath);
+        $userModel->updateProfile($userId, $fullName, $residentNumber, $contact, $address, $idPath);
 
         $_SESSION['username'] = $fullName;
 

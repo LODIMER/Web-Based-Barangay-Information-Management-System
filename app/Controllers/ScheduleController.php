@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\Controller;
+use App\Models\Schedule;
 
 class ScheduleController extends Controller
 {
@@ -18,8 +19,16 @@ class ScheduleController extends Controller
             $this->redirect('/login');
         }
 
-        // Demo data for now; can be loaded from DB later.
-        $upcoming = [];
+        $scheduleModel = new Schedule();
+        $rows = $scheduleModel->upcomingWithDetails();
+
+        $upcoming = array_map(static function (array $row): array {
+            return [
+                'title' => $row['request_type'],
+                'subtitle' => $row['scheduled_date'],
+                'status' => ucfirst($row['urgency_level']),
+            ];
+        }, $rows);
 
         $this->view('schedule/index', [
             'title' => 'My Schedule',

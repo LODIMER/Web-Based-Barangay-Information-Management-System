@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS users (
   username VARCHAR(50) NOT NULL UNIQUE,
   password VARCHAR(255) NOT NULL,
   full_name VARCHAR(100) NOT NULL,
+  resident_number VARCHAR(20) NULL,
   contact_number VARCHAR(20) NULL,
   address VARCHAR(255) NULL,
   id_document_path VARCHAR(255) NULL,
@@ -39,6 +40,26 @@ CREATE TABLE IF NOT EXISTS officials (
   term_start DATE NULL,
   term_end DATE NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS ayuda_requests (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  request_type VARCHAR(100) NOT NULL,
+  urgency_level ENUM('low','medium','high') NOT NULL,
+  description TEXT NOT NULL,
+  preferred_date DATE NULL,
+  contact_number VARCHAR(20) NOT NULL,
+  created_by INT UNSIGNED NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX (created_by)
+);
+
+CREATE TABLE IF NOT EXISTS schedules (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  ayuda_request_id INT UNSIGNED NOT NULL,
+  scheduled_date DATE NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX (ayuda_request_id)
 );
 
 -- Seed demo admin user (password: admin123)

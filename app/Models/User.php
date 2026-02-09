@@ -41,10 +41,11 @@ class User extends Model
         ]);
     }
 
-    public function updateProfile(int $id, string $fullName, string $contactNumber, string $address, ?string $idDocumentPath): bool
+    public function updateProfile(int $id, string $fullName, string $residentNumber, string $contactNumber, string $address, ?string $idDocumentPath): bool
     {
         $fields = [
             'full_name' => $fullName,
+            'resident_number' => $residentNumber,
             'contact_number' => $contactNumber,
             'address' => $address,
         ];
