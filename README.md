@@ -109,6 +109,24 @@ You have two options:
 - **Common**
   - `GET /logout` → `AuthController@logout`
 
+### URLs when running under XAMPP
+
+If the project folder is `Web-Based-Barangay-Information-Management-System` inside `htdocs`, use these URLs in your browser:
+
+- **Resident**
+  - Dashboard:  
+    `http://localhost/Web-Based-Barangay-Information-Management-System/`
+  - Login:  
+    `http://localhost/Web-Based-Barangay-Information-Management-System/login`
+  - Register:  
+    `http://localhost/Web-Based-Barangay-Information-Management-System/register`
+
+- **Barangay Official / Admin**
+  - Official login:  
+    `http://localhost/Web-Based-Barangay-Information-Management-System/login/official`
+  - Official register:  
+    `http://localhost/Web-Based-Barangay-Information-Management-System/register/official`
+
 ### Notes
 
 - Core MVC structure:
