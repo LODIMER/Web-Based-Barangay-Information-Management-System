@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Blotter</title>
+    <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: topnav}"></div>
+<main class="container">
+    <h1>Barangay Blotter</h1>
+    <div class="alert success" th:if="${success}" th:text="${success}"></div>
+    <div class="alert error" th:if="${error}" th:text="${error}"></div>
+
+    <section class="grid two">
+        <article class="card">
+            <h3>Submit Incident Report</h3>
+            <form method="post" action="/blotter">
+                <label>Incident Date</label>
+                <input type="date" name="incidentDate" required>
+
+                <label>Type</label>
+                <input name="type" placeholder="e.g. Theft, Noise Complaint" required>
+
+                <label>Location</label>
+                <input name="location" placeholder="e.g. Main St, Barangay Sample" required>
+
+                <label>Details</label>
+                <textarea name="details" placeholder="Describe what happened..." required></textarea>
+
+                <button type="submit">Submit Report</button>
+            </form>
+        </article>
+
+        <article class="card">
+            <h3>Recent Reports</h3>
+            <form method="get" action="/blotter" class="inline-form blotter-filters">
+                <select name="status">
+                    <option value="ALL" th:selected="${selectedStatus == 'ALL'}">All Status</option>
+                    <option value="PENDING" th:selected="${selectedStatus == 'PENDING'}">Pending</option>
+                    <option value="APPROVED" th:selected="${selectedStatus == 'APPROVED'}">Approved</option>
+                    <option value="RESOLVED" th:selected="${selectedStatus == 'RESOLVED'}">Resolved</option>
+                    <option value="REJECTED" th:selected="${selectedStatus == 'REJECTED'}">Rejected</option>
+                </select>
+                <input type="hidden" name="page" value="0">
+                <input type="hidden" name="size" th:value="${size}">
+                <input
+                    type="text"
+                    name="q"
+                    placeholder="Search type, location, or details"
+                    th:value="${query}"
+                >
+                <button type="submit">Filter</button>
+                <a href="/blotter" class="reset-link">Reset</a>
+            </form>
+            <table>
+                <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th th:if="${isOfficialOrAdmin}">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(reports)}">
+                    <td th:colspan="${isOfficialOrAdmin} ? 4 : 3">No reports yet.</td>
+                </tr>
+                <tr th:each="r : ${reports}">
+                    <td th:text="${r.incidentDate}">2026-02-01</td>
+                    <td>
+                        <div th:text="${r.type}">Type</div>
+                        <div class="tiny" th:text="${r.location}">Location</div>
+                    </td>
+                    <td th:text="${r.status}">PENDING</td>
+                    <td th:if="${isOfficialOrAdmin}">
+                        <form method="post" action="/blotter/status" class="inline-form">
+                            <input type="hidden" name="id" th:value="${r.id}">
+                            <select name="status">
+                                <option value="PENDING" th:selected="${r.status == 'PENDING'}">PENDING</option>
+                                <option value="APPROVED" th:selected="${r.status == 'APPROVED'}">APPROVED</option>
+                                <option value="RESOLVED" th:selected="${r.status == 'RESOLVED'}">RESOLVED</option>
+                                <option value="REJECTED" th:selected="${r.status == 'REJECTED'}">REJECTED</option>
+                            </select>
+                            <button type="submit">Update</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="pager">
+                <a
+                    class="pager-link"
+                    th:classappend="${!hasPrev} ? 'disabled'"
+                    th:href="${hasPrev} ? @{/blotter(status=${selectedStatus},q=${query},page=${page - 1},size=${size})} : '#'"
+                >Previous</a>
+                <span class="tiny">Page <span th:text="${page + 1}">1</span><span th:if="${totalPages > 0}"> / <span th:text="${totalPages}">1</span></span></span>
+                <a
+                    class="pager-link"
+                    th:classappend="${!hasNext} ? 'disabled'"
+                    th:href="${hasNext} ? @{/blotter(status=${selectedStatus},q=${query},page=${page + 1},size=${size})} : '#'"
+                >Next</a>
+            </div>
+        </article>
+    </section>
+</main>
+</body>
+</html>
+

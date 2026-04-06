@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ayuda</title>
+    <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: topnav}"></div>
+<main class="container">
+    <h1 th:text="${(role == 'OFFICIAL' or role == 'ADMIN') ? 'Add Ayuda' : 'Request Ayuda'}">Request Ayuda</h1>
+    <div class="alert success" th:if="${success}" th:text="${success}"></div>
+
+    <section class="card">
+        <form method="post" action="/ayuda/request">
+            <label>Request Type</label>
+            <select name="requestType" required>
+                <option>Financial Assistance</option>
+                <option>Medical / Health</option>
+                <option>Food Packs / Relief Goods</option>
+                <option>Document Processing</option>
+                <option>Legal Advice</option>
+                <option>Other</option>
+            </select>
+
+            <label>Urgency Level</label>
+            <select name="urgencyLevel">
+                <option value="LOW">Low</option>
+                <option value="MEDIUM" selected>Medium</option>
+                <option value="HIGH">High</option>
+            </select>
+
+            <label>Description</label>
+            <textarea name="description" required></textarea>
+
+            <label>Preferred Date</label>
+            <input type="date" name="preferredDate">
+
+            <button type="submit" th:text="${(role == 'OFFICIAL' or role == 'ADMIN') ? 'Save Ayuda & Schedule' : 'Submit Request'}">Submit</button>
+        </form>
+    </section>
+</main>
+</body>
+</html>
+

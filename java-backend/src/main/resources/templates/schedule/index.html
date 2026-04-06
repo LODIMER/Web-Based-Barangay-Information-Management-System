@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Schedule</title>
+    <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: topnav}"></div>
+<main class="container">
+    <h1>Schedule</h1>
+    <section class="card">
+        <h3>Upcoming</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Urgency</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(upcoming)}">
+                <td colspan="3">No upcoming schedules.</td>
+            </tr>
+            <tr th:each="s : ${upcoming}">
+                <td th:text="${s.scheduledDate}">2026-02-01</td>
+                <td th:text="${s.ayudaRequest.requestType}">Food</td>
+                <td th:text="${s.ayudaRequest.urgencyLevel}">MEDIUM</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+</body>
+</html>
+

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Register</title>
+    <link rel="stylesheet" href="/css/app.css">
+</head>
+<body class="auth-bg">
+<main class="auth-wrap">
+    <section class="card auth-card">
+        <h1 th:text="${official} ? 'Create Official Account' : 'Create Resident Account'">Register</h1>
+        <p class="muted">Fill in your account details.</p>
+
+        <div class="alert error" th:if="${error}" th:text="${error}"></div>
+
+        <form method="post" action="/register">
+            <input type="hidden" name="official" th:value="${official}">
+            <label>Username</label>
+            <input name="username" required>
+
+            <label>Full Name</label>
+            <input name="fullName" required>
+
+            <label>Password</label>
+            <input name="password" type="password" required minlength="6">
+
+            <label>Confirm Password</label>
+            <input name="confirmPassword" type="password" required minlength="6">
+
+            <button type="submit" th:text="${official} ? 'Register Official' : 'Register Resident'">Register</button>
+        </form>
+
+        <p class="tiny" th:if="${official}">
+            Already have official account? <a href="/login/official">Official login</a>
+        </p>
+        <p class="tiny" th:if="${!official}">
+            Already have account? <a href="/login">Resident login</a>
+        </p>
+    </section>
+</main>
+</body>
+</html>
+

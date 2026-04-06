@@ -1,6 +1,9 @@
-## Java Backend (Spring Boot)
+## Java Backend + Web App (Spring Boot)
 
-This folder contains the Java-only backend rewrite starter for the Barangay system.
+This folder contains the Java-only rewrite for the Barangay system:
+
+- REST APIs (`/api/...`)
+- Thymeleaf web pages (`/login`, `/register`, `/`, `/profile`, `/ayuda/request`, `/schedule`)
 
 ### Stack
 
@@ -21,6 +24,23 @@ This folder contains the Java-only backend rewrite starter for the Barangay syst
 - `POST /api/profile/id-upload` - upload a valid ID (multipart form-data, field name: `file`)
 - `POST /api/ayuda` - create ayuda request (official/admin auto-creates schedule when `preferredDate` is set)
 - `GET /api/schedules/upcoming` - list upcoming schedules
+- `GET /api/blotter` - list recent blotter reports
+- `POST /api/blotter` - create blotter report
+- `PATCH /api/blotter/{id}/status?status=APPROVED` - update blotter status (official/admin only)
+
+### Implemented Web Pages
+
+- `GET /login` - resident login page
+- `GET /register` - resident register page
+- `GET /login/official` - official login page
+- `GET /register/official` - official register page
+- `GET /` - role-aware dashboard
+- `GET /profile` - profile page (edit info + upload valid ID)
+- `GET /ayuda/request` - resident request / official add ayuda form
+- `GET /schedule` - schedules page
+- `GET /blotter` - blotter page (submit + view recent reports)
+  - Includes status filter (All/Pending/Approved/Resolved/Rejected) and search by type/location/details
+  - Includes pagination controls (previous/next)
 
 ### Run
 
@@ -33,6 +53,14 @@ This folder contains the Java-only backend rewrite starter for the Barangay syst
    ```
 
 3. App runs at `http://localhost:8080`.
+
+### Browser URLs
+
+- Resident login: `http://localhost:8080/login`
+- Resident register: `http://localhost:8080/register`
+- Official login: `http://localhost:8080/login/official`
+- Official register: `http://localhost:8080/register/official`
+- Blotter: `http://localhost:8080/blotter`
 
 ### Quick test (PowerShell)
 
@@ -70,5 +98,6 @@ curl -b cookies.txt -X POST http://localhost:8080/api/profile/id-upload ^
 - This is a migration starter to move from PHP to Java.
 - `/api/**` is now protected at Spring Security level (except `/api/auth/**`).
 - Authentication is session-based for now (cookie-backed).
-- Next step: add proper JWT or Spring Security auth filters and build Java frontend/API clients.
+- Resident number is auto-generated in resident registration (`RES-<userId>`).
+- Official/admin ayuda creation auto-syncs to schedule when preferred date is provided.
 

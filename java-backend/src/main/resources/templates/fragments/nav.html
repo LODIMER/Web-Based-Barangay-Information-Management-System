@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<nav th:fragment="topnav" class="topnav">
+    <a href="/" class="brand">Barangay IMS Java</a>
+    <div class="links">
+        <a href="/">Dashboard</a>
+        <a href="/profile">My Profile</a>
+        <a href="/ayuda/request" th:text="${(role == 'OFFICIAL' or role == 'ADMIN') ? 'Add Ayuda' : 'Request Ayuda'}">Request Ayuda</a>
+        <a href="/blotter">Blotter</a>
+        <a href="/schedule" th:if="${role == 'OFFICIAL' or role == 'ADMIN'}">Add Schedule</a>
+    </div>
+    <form method="post" action="/logout">
+        <button type="submit">Logout</button>
+    </form>
+</nav>
+</body>
+</html>
+

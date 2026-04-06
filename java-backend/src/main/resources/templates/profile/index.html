@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My Profile</title>
+    <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: topnav}"></div>
+<main class="container">
+    <h1>My Profile</h1>
+    <div class="alert success" th:if="${success}" th:text="${success}"></div>
+    <div class="alert error" th:if="${error}" th:text="${error}"></div>
+
+    <section class="card">
+        <form method="post" action="/profile" enctype="multipart/form-data">
+            <label>Full Name</label>
+            <input name="fullName" th:value="${userProfile.fullName}" required>
+
+            <label th:if="${role == 'RESIDENT'}">Resident Number</label>
+            <input th:if="${role == 'RESIDENT'}" th:value="${userProfile.residentNumber}" readonly>
+
+            <label>Contact Number</label>
+            <input name="contactNumber" th:value="${userProfile.contactNumber}">
+
+            <label>Address</label>
+            <textarea name="address" th:text="${userProfile.address}"></textarea>
+
+            <label>Upload Valid ID (jpg/png/pdf)</label>
+            <input type="file" name="idFile" accept=".jpg,.jpeg,.png,.pdf">
+
+            <p class="tiny" th:if="${userProfile.idDocumentPath != null}">
+                ID on file: <span th:text="${userProfile.idDocumentPath}"></span>
+            </p>
+            <p class="tiny" th:text="${userProfile.verified} ? 'Verified' : 'Not verified yet'"></p>
+
+            <button type="submit">Save Changes</button>
+        </form>
+    </section>
+</main>
+</body>
+</html>
+
