@@ -60,6 +60,30 @@ Install these first:
 - Maven 3.9+ (or any recent Maven)
 - MySQL (or MariaDB)
 
+### Download links
+
+- Java 17 (Temurin): [https://adoptium.net/temurin/releases/?version=17](https://adoptium.net/temurin/releases/?version=17)
+- Maven: [https://maven.apache.org/download.cgi](https://maven.apache.org/download.cgi)
+- MySQL Community Server: [https://dev.mysql.com/downloads/mysql/](https://dev.mysql.com/downloads/mysql/)
+- MySQL Workbench (optional GUI): [https://dev.mysql.com/downloads/workbench/](https://dev.mysql.com/downloads/workbench/)
+- XAMPP (optional, includes MySQL + phpMyAdmin): [https://www.apachefriends.org/download.html](https://www.apachefriends.org/download.html)
+
+### Quick install notes (Windows)
+
+1. Install **Java 17** and verify:
+   ```bash
+   java -version
+   ```
+2. Install **Maven**:
+   - Extract Maven zip (for example to `C:\tools\apache-maven-3.9.x`)
+   - Add Maven `bin` to PATH:
+     - `C:\tools\apache-maven-3.9.x\bin`
+   - Open a new terminal and verify:
+   ```bash
+   mvn -v
+   ```
+3. Install/start **MySQL** and make sure you can connect with your username/password.
+
 ---
 
 ## Step-by-step setup (first time)
