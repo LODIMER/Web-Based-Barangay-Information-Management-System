@@ -6,5 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     List<Schedule> findTop10ByOrderByScheduledDateAsc();
+    boolean existsByAyudaRequestId(Long ayudaRequestId);
 }
 

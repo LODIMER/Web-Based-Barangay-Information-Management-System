@@ -24,6 +24,9 @@ public class AyudaRequest {
     @Column(name = "preferred_date")
     private LocalDate preferredDate;
 
+    @Column(nullable = false, length = 30)
+    private String status = "PENDING";
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
     private User createdBy;
@@ -40,6 +43,8 @@ public class AyudaRequest {
     public void setDescription(String description) { this.description = description; }
     public LocalDate getPreferredDate() { return preferredDate; }
     public void setPreferredDate(LocalDate preferredDate) { this.preferredDate = preferredDate; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
     public User getCreatedBy() { return createdBy; }
     public void setCreatedBy(User createdBy) { this.createdBy = createdBy; }
     public LocalDateTime getCreatedAt() { return createdAt; }

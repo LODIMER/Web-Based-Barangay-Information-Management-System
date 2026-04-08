@@ -41,13 +41,28 @@ public class AyudaController {
         item.setDescription(req.description());
         item.setPreferredDate(req.preferredDate());
         item.setCreatedBy(user);
+        item.setStatus("PENDING");
 
-        AyudaRequest saved = ayudaRequestRepository.save(item);
+        return ayudaRequestRepository.save(item);
+    }
 
-        if ((user.getRole() == Role.OFFICIAL || user.getRole() == Role.ADMIN) && req.preferredDate() != null) {
+    @PatchMapping("/{id}/approve")
+    public AyudaRequest approve(@PathVariable Long id, HttpSession session) {
+        User user = currentUser(session);
+        if (user.getRole() != Role.OFFICIAL) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Official access required");
+        }
+
+        AyudaRequest request = ayudaRequestRepository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ayuda request not found"));
+
+        request.setStatus("APPROVED");
+        AyudaRequest saved = ayudaRequestRepository.save(request);
+
+        if (request.getPreferredDate() != null && !scheduleRepository.existsByAyudaRequestId(request.getId())) {
             Schedule schedule = new Schedule();
             schedule.setAyudaRequest(saved);
-            schedule.setScheduledDate(req.preferredDate());
+            schedule.setScheduledDate(request.getPreferredDate());
             scheduleRepository.save(schedule);
         }
 

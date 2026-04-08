@@ -30,6 +30,7 @@ erDiagram
         VARCHAR urgency_level
         TEXT description
         DATE preferred_date
+        VARCHAR status
         BIGINT created_by FK
         TIMESTAMP created_at
     }
@@ -63,5 +64,6 @@ erDiagram
 
 - `role` is stored as string enum values: `RESIDENT`, `OFFICIAL`, `ADMIN`.
 - `urgency_level` uses enum values: `LOW`, `MEDIUM`, `HIGH`.
+- `ayuda_requests.status` uses values: `PENDING`, `APPROVED`.
 - New resident accounts auto-generate `resident_number` format like `RES-001`.
 

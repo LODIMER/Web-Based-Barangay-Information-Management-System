@@ -9,8 +9,9 @@
 <body>
 <div th:replace="~{fragments/nav :: topnav}"></div>
 <main class="container">
-    <h1 th:text="${(role == 'OFFICIAL' or role == 'ADMIN') ? 'Add Ayuda' : 'Request Ayuda'}">Request Ayuda</h1>
+    <h1>Request Ayuda</h1>
     <div class="alert success" th:if="${success}" th:text="${success}"></div>
+    <div class="alert error" th:if="${error}" th:text="${error}"></div>
 
     <section class="card">
         <form method="post" action="/ayuda/request">
@@ -37,8 +38,49 @@
             <label>Preferred Date</label>
             <input type="date" name="preferredDate">
 
-            <button type="submit" th:text="${(role == 'OFFICIAL' or role == 'ADMIN') ? 'Save Ayuda & Schedule' : 'Submit Request'}">Submit</button>
+            <button type="submit">Submit Request</button>
         </form>
+    </section>
+
+    <section class="card">
+        <h3>Recent Ayuda Requests</h3>
+        <form method="get" action="/ayuda/request" class="inline-form">
+            <label for="status">Status</label>
+            <select id="status" name="status">
+                <option value="ALL" th:selected="${selectedStatus == 'ALL'}">All</option>
+                <option value="PENDING" th:selected="${selectedStatus == 'PENDING'}">Pending</option>
+                <option value="APPROVED" th:selected="${selectedStatus == 'APPROVED'}">Approved</option>
+            </select>
+            <button type="submit">Filter</button>
+        </form>
+        <table>
+            <thead>
+            <tr>
+                <th>Type</th>
+                <th>Urgency</th>
+                <th>Preferred Date</th>
+                <th>Status</th>
+                <th th:if="${role == 'OFFICIAL'}">Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(requests)}">
+                <td th:colspan="${role == 'OFFICIAL'} ? 5 : 4">No ayuda requests yet.</td>
+            </tr>
+            <tr th:each="r : ${requests}">
+                <td th:text="${r.requestType}">Request Type</td>
+                <td th:text="${r.urgencyLevel}">MEDIUM</td>
+                <td th:text="${r.preferredDate != null ? r.preferredDate : '-'}">-</td>
+                <td th:text="${r.status}">PENDING</td>
+                <td th:if="${role == 'OFFICIAL'}">
+                    <form method="post" action="/ayuda/approve" class="inline-form">
+                        <input type="hidden" name="id" th:value="${r.id}">
+                        <button type="submit" th:disabled="${r.status == 'APPROVED'}">Approve</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
     </section>
 </main>
 </body>

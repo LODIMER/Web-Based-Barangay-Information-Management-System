@@ -7,6 +7,7 @@ It includes:
 - Official login and registration
 - Profile update + valid ID upload
 - Ayuda requests (official can auto-create schedule)
+- Ayuda requests with `PENDING` -> `APPROVED` flow (official approval only)
 - Schedule page
 - Blotter page (submit report, filter/search, status update for officials/admin)
 
@@ -41,8 +42,9 @@ If you already have Java, Maven, and MySQL installed, do this:
 1. A user registers as **Resident** or **Official**.
 2. User logs in and gets a session (keeps them signed in).
 3. Residents can request ayuda and submit blotter reports.
-4. Officials/admin can create ayuda entries with a preferred date; that date is also saved in schedule.
-5. Officials/admin can update blotter status:
+4. Ayuda requests are created with `PENDING` status.
+5. Barangay officials can approve ayuda requests (`APPROVED`), and if a preferred date exists, it is synced to schedule.
+6. Officials/admin can update blotter status:
    - `PENDING`
    - `APPROVED`
    - `RESOLVED`
@@ -155,6 +157,7 @@ When it starts, open:
 - `PUT /api/profile`
 - `POST /api/profile/id-upload` (multipart, field name: `file`)
 - `POST /api/ayuda`
+- `PATCH /api/ayuda/{id}/approve`
 - `GET /api/schedules/upcoming`
 - `GET /api/blotter`
 - `POST /api/blotter`

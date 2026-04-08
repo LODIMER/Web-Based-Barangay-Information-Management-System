@@ -34,11 +34,24 @@ public class AyudaPageController {
     }
 
     @GetMapping("/ayuda/request")
-    public String form(HttpSession session, Model model, RedirectAttributes ra) {
+    public String form(
+        @RequestParam(required = false) String status,
+        HttpSession session,
+        Model model,
+        RedirectAttributes ra
+    ) {
         String redirect = SessionSupport.requireLogin(session, userRepository, ra);
         if (redirect != null) return redirect;
         User user = SessionSupport.currentUserOrNull(session, userRepository);
         SessionSupport.nav(model, user);
+        String selectedStatus = normalizeStatusFilter(status, user);
+        if (selectedStatus == null) {
+            model.addAttribute("requests", ayudaRequestRepository.findTop50ByOrderByCreatedAtDesc());
+            model.addAttribute("selectedStatus", "ALL");
+        } else {
+            model.addAttribute("requests", ayudaRequestRepository.findTop50ByStatusOrderByCreatedAtDesc(selectedStatus));
+            model.addAttribute("selectedStatus", selectedStatus);
+        }
         return "ayuda/form";
     }
 
@@ -62,19 +75,56 @@ public class AyudaPageController {
             req.setPreferredDate(LocalDate.parse(preferredDate));
         }
         req.setCreatedBy(user);
-        req = ayudaRequestRepository.save(req);
+        req.setStatus("PENDING");
+        ayudaRequestRepository.save(req);
 
-        if ((user.getRole() == Role.OFFICIAL || user.getRole() == Role.ADMIN) && req.getPreferredDate() != null) {
+        ra.addFlashAttribute("success", "Ayuda request submitted and pending approval.");
+
+        return "redirect:/ayuda/request";
+    }
+
+    @PostMapping("/ayuda/approve")
+    public String approve(
+        @RequestParam Long id,
+        HttpSession session,
+        RedirectAttributes ra
+    ) {
+        User user = SessionSupport.currentUserOrNull(session, userRepository);
+        if (user == null) return "redirect:/login";
+        if (user.getRole() != Role.OFFICIAL) {
+            ra.addFlashAttribute("error", "Only barangay officials can approve ayuda requests.");
+            return "redirect:/ayuda/request";
+        }
+
+        AyudaRequest req = ayudaRequestRepository.findById(id).orElse(null);
+        if (req == null) {
+            ra.addFlashAttribute("error", "Ayuda request not found.");
+            return "redirect:/ayuda/request";
+        }
+
+        req.setStatus("APPROVED");
+        ayudaRequestRepository.save(req);
+
+        if (req.getPreferredDate() != null && !scheduleRepository.existsByAyudaRequestId(req.getId())) {
             Schedule schedule = new Schedule();
             schedule.setAyudaRequest(req);
             schedule.setScheduledDate(req.getPreferredDate());
             scheduleRepository.save(schedule);
-            ra.addFlashAttribute("success", "Ayuda saved and synced to schedule.");
-        } else {
-            ra.addFlashAttribute("success", "Ayuda request submitted.");
         }
 
+        ra.addFlashAttribute("success", "Ayuda request approved.");
         return "redirect:/ayuda/request";
+    }
+
+    private String normalizeStatusFilter(String status, User user) {
+        // Officials default to pending queue for faster approval workflow.
+        if (status == null || status.isBlank()) {
+            return user != null && user.getRole() == Role.OFFICIAL ? "PENDING" : null;
+        }
+        String normalized = status.trim().toUpperCase();
+        if (normalized.equals("ALL")) return null;
+        if (normalized.equals("PENDING") || normalized.equals("APPROVED")) return normalized;
+        return user != null && user.getRole() == Role.OFFICIAL ? "PENDING" : null;
     }
 }
 
