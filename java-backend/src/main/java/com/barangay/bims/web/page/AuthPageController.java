@@ -24,32 +24,32 @@ public class AuthPageController {
 
     @GetMapping("/login")
     public String loginPage(Model model) {
-        model.addAttribute("official", false);
+        model.addAttribute("selectedRole", "RESIDENT");
         return "auth/login";
     }
 
     @GetMapping("/login/official")
-    public String officialLoginPage(Model model) {
-        model.addAttribute("official", true);
-        return "auth/login";
+    public String officialLoginPage() {
+        return "redirect:/login";
     }
 
     @PostMapping("/login")
     public String login(
         @RequestParam String username,
         @RequestParam String password,
-        @RequestParam(defaultValue = "false") boolean official,
+        @RequestParam(defaultValue = "RESIDENT") String role,
         HttpSession session,
         RedirectAttributes ra
     ) {
+        String selectedRole = normalizeRoleSelection(role);
         User user = userRepository.findByUsername(username).orElse(null);
         if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
             ra.addFlashAttribute("error", "Invalid credentials.");
-            return official ? "redirect:/login/official" : "redirect:/login";
+            return "redirect:/login";
         }
-        if (official && user.getRole() != Role.OFFICIAL && user.getRole() != Role.ADMIN) {
-            ra.addFlashAttribute("error", "Official account required.");
-            return "redirect:/login/official";
+        if (!loginRoleMatches(user.getRole(), selectedRole)) {
+            ra.addFlashAttribute("error", "Account type does not match your selection.");
+            return "redirect:/login";
         }
 
         session.setAttribute("userId", user.getId());
@@ -59,14 +59,13 @@ public class AuthPageController {
 
     @GetMapping("/register")
     public String registerPage(Model model) {
-        model.addAttribute("official", false);
+        model.addAttribute("selectedRole", "RESIDENT");
         return "auth/register";
     }
 
     @GetMapping("/register/official")
-    public String officialRegisterPage(Model model) {
-        model.addAttribute("official", true);
-        return "auth/register";
+    public String officialRegisterPage() {
+        return "redirect:/register";
     }
 
     @PostMapping("/register")
@@ -75,42 +74,56 @@ public class AuthPageController {
         @RequestParam String fullName,
         @RequestParam String password,
         @RequestParam String confirmPassword,
-        @RequestParam(defaultValue = "false") boolean official,
+        @RequestParam(defaultValue = "RESIDENT") String role,
         RedirectAttributes ra
     ) {
+        String selectedRole = normalizeRoleSelection(role);
         if (!password.equals(confirmPassword)) {
             ra.addFlashAttribute("error", "Passwords do not match.");
-            return official ? "redirect:/register/official" : "redirect:/register";
+            return "redirect:/register";
         }
         if (password.length() < 6) {
             ra.addFlashAttribute("error", "Password must be at least 6 characters.");
-            return official ? "redirect:/register/official" : "redirect:/register";
+            return "redirect:/register";
         }
         if (userRepository.findByUsername(username).isPresent()) {
             ra.addFlashAttribute("error", "Username already exists.");
-            return official ? "redirect:/register/official" : "redirect:/register";
+            return "redirect:/register";
         }
 
         User user = new User();
         user.setUsername(username);
         user.setFullName(fullName);
         user.setPassword(passwordEncoder.encode(password));
-        user.setRole(official ? Role.OFFICIAL : Role.RESIDENT);
+        user.setRole("OFFICIAL".equals(selectedRole) ? Role.OFFICIAL : Role.RESIDENT);
         user = userRepository.save(user);
 
-        if (!official) {
+        if ("RESIDENT".equals(selectedRole)) {
             user.setResidentNumber(String.format("RES-%03d", user.getId()));
             userRepository.save(user);
         }
 
         ra.addFlashAttribute("success", "Account created. Please login.");
-        return official ? "redirect:/login/official" : "redirect:/login";
+        return "redirect:/login";
     }
 
     @PostMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();
         return "redirect:/login";
+    }
+
+    private String normalizeRoleSelection(String role) {
+        String normalized = role == null ? "" : role.trim().toUpperCase();
+        if (!normalized.equals("RESIDENT") && !normalized.equals("OFFICIAL")) {
+            return "RESIDENT";
+        }
+        return normalized;
+    }
+
+    private boolean loginRoleMatches(Role actualRole, String selectedRole) {
+        if ("RESIDENT".equals(selectedRole)) return actualRole == Role.RESIDENT;
+        return actualRole == Role.OFFICIAL || actualRole == Role.ADMIN;
     }
 }
 

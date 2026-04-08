@@ -2,7 +2,14 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <body>
 <nav th:fragment="topnav" class="topnav">
-    <a href="/" class="brand">Barangay IMS Java</a>
+    <a href="/" class="brand">
+        <img
+            class="brand-logo"
+            src="/images/logo.png"
+            alt="Barangay Information Management System logo"
+        >
+        <span class="brand-text">Barangay Information Management System</span>
+    </a>
     <div class="links">
         <a href="/">Dashboard</a>
         <a href="/profile">My Profile</a>

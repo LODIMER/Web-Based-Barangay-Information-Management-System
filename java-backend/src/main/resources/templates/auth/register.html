@@ -3,19 +3,29 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Register</title>
+    <title>Barangay Information Management System - Register</title>
     <link rel="stylesheet" href="/css/app.css">
 </head>
 <body class="auth-bg">
 <main class="auth-wrap">
     <section class="card auth-card">
-        <h1 th:text="${official} ? 'Create Official Account' : 'Create Resident Account'">Register</h1>
-        <p class="muted">Fill in your account details.</p>
+        <img
+            class="auth-logo"
+            src="/images/logo.png"
+            alt="Barangay Information Management System logo"
+        >
+        <h1>Barangay Information Management System</h1>
+        <p class="muted">Create a resident or barangay official account.</p>
 
         <div class="alert error" th:if="${error}" th:text="${error}"></div>
 
         <form method="post" action="/register">
-            <input type="hidden" name="official" th:value="${official}">
+            <label>Account Type</label>
+            <select name="role" required>
+                <option value="RESIDENT" th:selected="${selectedRole == 'RESIDENT'}">Resident</option>
+                <option value="OFFICIAL" th:selected="${selectedRole == 'OFFICIAL'}">Barangay Official</option>
+            </select>
+
             <label>Username</label>
             <input name="username" required>
 
@@ -28,15 +38,10 @@
             <label>Confirm Password</label>
             <input name="confirmPassword" type="password" required minlength="6">
 
-            <button type="submit" th:text="${official} ? 'Register Official' : 'Register Resident'">Register</button>
+            <button type="submit">Register</button>
         </form>
 
-        <p class="tiny" th:if="${official}">
-            Already have official account? <a href="/login/official">Official login</a>
-        </p>
-        <p class="tiny" th:if="${!official}">
-            Already have account? <a href="/login">Resident login</a>
-        </p>
+        <p class="tiny">Already have an account? <a href="/login">Login</a></p>
     </section>
 </main>
 </body>

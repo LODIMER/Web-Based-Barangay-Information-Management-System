@@ -32,8 +32,7 @@ If you already have Java, Maven, and MySQL installed, do this:
    ```
 
 5. Open:
-   - `http://localhost:8080/register` (resident register), or
-   - `http://localhost:8080/register/official` (official register)
+   - `http://localhost:8080/register` (choose Resident or Barangay Official)
 
 ---
 
@@ -136,8 +135,8 @@ When it starts, open:
 
 - Resident login: `http://localhost:8080/login`
 - Resident register: `http://localhost:8080/register`
-- Official login: `http://localhost:8080/login/official`
-- Official register: `http://localhost:8080/register/official`
+- Login: `http://localhost:8080/login` (choose Resident or Barangay Official)
+- Register: `http://localhost:8080/register` (choose Resident or Barangay Official)
 - Dashboard: `http://localhost:8080/`
 - Profile: `http://localhost:8080/profile`
 - Ayuda form: `http://localhost:8080/ayuda/request`
@@ -148,10 +147,8 @@ When it starts, open:
 
 ## API (optional, for testing/Postman)
 
-- `POST /api/auth/register/resident`
-- `POST /api/auth/register/official`
+- `POST /api/auth/register`
 - `POST /api/auth/login`
-- `POST /api/auth/login/official`
 - `POST /api/auth/logout`
 - `GET /api/profile`
 - `PUT /api/profile`

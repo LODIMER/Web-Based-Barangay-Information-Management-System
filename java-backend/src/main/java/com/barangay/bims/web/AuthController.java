@@ -24,23 +24,42 @@ public class AuthController {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @PostMapping("/register")
+    public AuthResponse register(@Valid @RequestBody RegisterRequest req) {
+        Role selectedRole = normalizeRole(req.role());
+        if (selectedRole == Role.ADMIN) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin role is not self-registrable");
+        }
+        return registerWithRole(req, selectedRole);
+    }
+
     @PostMapping("/register/resident")
     public AuthResponse registerResident(@Valid @RequestBody RegisterRequest req) {
-        return register(req, Role.RESIDENT);
+        RegisterRequest normalizedReq = new RegisterRequest(
+            req.username(), req.fullName(), req.password(), req.confirmPassword(), "RESIDENT"
+        );
+        return register(normalizedReq);
     }
 
     @PostMapping("/register/official")
     public AuthResponse registerOfficial(@Valid @RequestBody RegisterRequest req) {
-        return register(req, Role.OFFICIAL);
+        RegisterRequest normalizedReq = new RegisterRequest(
+            req.username(), req.fullName(), req.password(), req.confirmPassword(), "OFFICIAL"
+        );
+        return register(normalizedReq);
     }
 
     @PostMapping("/login")
     public AuthResponse login(@Valid @RequestBody LoginRequest req, HttpSession session) {
+        Role selectedRole = normalizeRole(req.role());
         User user = userRepository.findByUsername(req.username())
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials"));
 
         if (!passwordEncoder.matches(req.password(), user.getPassword())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
+        }
+        if (!roleMatchesSelection(user.getRole(), selectedRole)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Role does not match selected account type");
         }
 
         session.setAttribute("userId", user.getId());
@@ -51,11 +70,8 @@ public class AuthController {
 
     @PostMapping("/login/official")
     public AuthResponse officialLogin(@Valid @RequestBody LoginRequest req, HttpSession session) {
-        AuthResponse resp = login(req, session);
-        if (!"OFFICIAL".equals(resp.role()) && !"ADMIN".equals(resp.role())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Official account required");
-        }
-        return resp;
+        LoginRequest normalizedReq = new LoginRequest(req.username(), req.password(), "OFFICIAL");
+        return login(normalizedReq, session);
     }
 
     @PostMapping("/logout")
@@ -63,7 +79,7 @@ public class AuthController {
         session.invalidate();
     }
 
-    private AuthResponse register(RegisterRequest req, Role role) {
+    private AuthResponse registerWithRole(RegisterRequest req, Role role) {
         if (!req.password().equals(req.confirmPassword())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Passwords do not match");
         }
@@ -85,6 +101,24 @@ public class AuthController {
             saved = userRepository.save(saved);
         }
         return new AuthResponse(saved.getId(), saved.getUsername(), saved.getRole().name());
+    }
+
+    private Role normalizeRole(String role) {
+        if (role == null || role.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Role is required");
+        }
+        String normalized = role.trim().toUpperCase();
+        try {
+            return Role.valueOf(normalized);
+        } catch (IllegalArgumentException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid role selected");
+        }
+    }
+
+    private boolean roleMatchesSelection(Role actualRole, Role selectedRole) {
+        if (selectedRole == Role.RESIDENT) return actualRole == Role.RESIDENT;
+        if (selectedRole == Role.OFFICIAL) return actualRole == Role.OFFICIAL || actualRole == Role.ADMIN;
+        return false;
     }
 }
 

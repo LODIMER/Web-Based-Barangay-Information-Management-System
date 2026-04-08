@@ -3,38 +3,40 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Login</title>
+    <title>Barangay Information Management System - Login</title>
     <link rel="stylesheet" href="/css/app.css">
 </head>
 <body class="auth-bg">
 <main class="auth-wrap">
     <section class="card auth-card">
-        <h1 th:text="${official} ? 'Barangay Official Login' : 'Resident Login'">Login</h1>
-        <p class="muted">Access your Barangay Information System account.</p>
+        <img
+            class="auth-logo"
+            src="/images/logo.png"
+            alt="Barangay Information Management System logo"
+        >
+        <h1>Barangay Information Management System</h1>
+        <p class="muted">Login to your resident or barangay official account.</p>
 
         <div class="alert error" th:if="${error}" th:text="${error}"></div>
         <div class="alert success" th:if="${success}" th:text="${success}"></div>
 
         <form method="post" action="/login">
-            <input type="hidden" name="official" th:value="${official}">
+            <label>Account Type</label>
+            <select name="role" required>
+                <option value="RESIDENT" th:selected="${selectedRole == 'RESIDENT'}">Resident</option>
+                <option value="OFFICIAL" th:selected="${selectedRole == 'OFFICIAL'}">Barangay Official</option>
+            </select>
+
             <label>Username</label>
             <input name="username" required>
 
             <label>Password</label>
             <input name="password" type="password" required>
 
-            <button type="submit" th:text="${official} ? 'Login as Official' : 'Login'">Login</button>
+            <button type="submit">Login</button>
         </form>
 
-        <p class="tiny" th:if="${official}">
-            Need resident portal? <a href="/login">Resident login</a>
-        </p>
-        <p class="tiny" th:if="${official}">
-            New official? <a href="/register/official">Create official account</a>
-        </p>
-        <p class="tiny" th:if="${!official}">
-            No account yet? <a href="/register">Create resident account</a>
-        </p>
+        <p class="tiny">No account yet? <a href="/register">Create account</a></p>
     </section>
 </main>
 </body>

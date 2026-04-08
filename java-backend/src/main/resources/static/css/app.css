@@ -1,7 +1,9 @@
 * { box-sizing: border-box; }
 body { margin: 0; font-family: Arial, sans-serif; background: #f5f7fb; color: #111827; }
 .topnav { display:flex; justify-content:space-between; align-items:center; padding: 12px 16px; background:#0f766e; color:#fff; gap: 12px; }
-.topnav .brand { color:#fff; text-decoration:none; font-weight:700; }
+.topnav .brand { color:#fff; text-decoration:none; font-weight:700; display:flex; align-items:center; gap:10px; }
+.topnav .brand-logo { width:32px; height:32px; object-fit:cover; border-radius:50%; border:1px solid rgba(255,255,255,0.4); }
+.topnav .brand-text { font-size:14px; line-height:1.2; }
 .topnav .links { display:flex; gap: 10px; flex-wrap: wrap; }
 .topnav .links a { color:#fff; text-decoration:none; font-size: 14px; }
 .topnav button { background:#fff; border:0; border-radius:6px; padding:6px 10px; cursor:pointer; }
@@ -25,6 +27,9 @@ button[type="submit"] { background:#16a34a; color:#fff; border:0; border-radius:
 .auth-bg { background:#ecfdf5; }
 .auth-wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; padding: 16px; }
 .auth-card { width:100%; max-width: 360px; }
+.auth-logo { display:block; width:88px; height:88px; object-fit:cover; border-radius:50%; margin:0 auto 12px; border:2px solid #ddd6fe; }
+.auth-card h1 { text-align:center; font-size:20px; margin-bottom:8px; }
+.auth-card .muted { text-align:center; margin-bottom:8px; }
 table { width:100%; border-collapse: collapse; }
 th, td { border-bottom:1px solid #e5e7eb; text-align:left; padding:8px; font-size:14px; }
 .inline-form { display:flex; gap:8px; align-items:center; }
