@@ -23,6 +23,9 @@ public class BlotterReport {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String details;
 
+    @Column(name = "resident_update_request", columnDefinition = "TEXT")
+    private String residentUpdateRequest;
+
     @Column(nullable = false, length = 30)
     private String status = "PENDING";
 
@@ -42,6 +45,8 @@ public class BlotterReport {
     public void setLocation(String location) { this.location = location; }
     public String getDetails() { return details; }
     public void setDetails(String details) { this.details = details; }
+    public String getResidentUpdateRequest() { return residentUpdateRequest; }
+    public void setResidentUpdateRequest(String residentUpdateRequest) { this.residentUpdateRequest = residentUpdateRequest; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
     public User getReportedBy() { return reportedBy; }

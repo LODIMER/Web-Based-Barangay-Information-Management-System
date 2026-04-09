@@ -1,5 +1,6 @@
 package com.barangay.bims.web;
 
+import com.barangay.bims.domain.Role;
 import com.barangay.bims.domain.User;
 import com.barangay.bims.repo.UserRepository;
 import com.barangay.bims.web.dto.ProfileDtos.UpdateProfileRequest;
@@ -34,7 +35,9 @@ public class ProfileController {
     @PutMapping
     public User update(@Valid @RequestBody UpdateProfileRequest req, HttpSession session) {
         User user = currentUser(session);
-        user.setFullName(req.fullName());
+        if (user.getRole() != Role.RESIDENT) {
+            user.setFullName(req.fullName());
+        }
         user.setContactNumber(req.contactNumber());
         user.setAddress(req.address());
         User saved = userRepository.save(user);
@@ -45,6 +48,9 @@ public class ProfileController {
     @PostMapping(value = "/id-upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public User uploadValidId(@RequestParam("file") MultipartFile file, HttpSession session) {
         User user = currentUser(session);
+        if (user.getRole() == Role.RESIDENT) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Residents can only update phone number and address");
+        }
 
         if (file.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File is required");

@@ -26,7 +26,10 @@ public class BlotterController {
 
     @GetMapping
     public List<BlotterReport> list(HttpSession session) {
-        requireLogin(session);
+        User user = currentUser(session);
+        if (user.getRole() == Role.RESIDENT) {
+            return blotterRepo.searchForResident(user.getId(), null, null, org.springframework.data.domain.PageRequest.of(0, 50)).getContent();
+        }
         return blotterRepo.findTop50ByOrderByCreatedAtDesc();
     }
 
@@ -50,8 +53,8 @@ public class BlotterController {
         HttpSession session
     ) {
         User user = currentUser(session);
-        if (user.getRole() != Role.OFFICIAL && user.getRole() != Role.ADMIN) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Official/admin access required");
+        if (user.getRole() != Role.OFFICIAL || !user.isOfficialApproved()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Approved official access required");
         }
 
         String normalized = status == null ? "" : status.trim().toUpperCase();
@@ -66,10 +69,28 @@ public class BlotterController {
         return blotterRepo.save(report);
     }
 
-    private void requireLogin(HttpSession session) {
-        if (session.getAttribute("userId") == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required");
+    @PatchMapping("/{id}/request-update")
+    public BlotterReport requestUpdate(
+        @PathVariable Long id,
+        @RequestParam String requestMessage,
+        HttpSession session
+    ) {
+        User user = currentUser(session);
+        if (user.getRole() != Role.RESIDENT) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Resident access required");
         }
+        if (requestMessage == null || requestMessage.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request message is required");
+        }
+
+        BlotterReport report = blotterRepo.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Report not found"));
+        if (report.getReportedBy() == null || !report.getReportedBy().getId().equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only request updates for your own reports");
+        }
+
+        report.setResidentUpdateRequest(requestMessage.trim());
+        return blotterRepo.save(report);
     }
 
     private User currentUser(HttpSession session) {

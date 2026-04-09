@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Barangay Information Management System - Residents</title>
+    <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: topnav}"></div>
+<main class="container">
+    <h1>Resident Management</h1>
+
+    <div class="alert error" th:if="${error}" th:text="${error}"></div>
+    <div class="alert success" th:if="${success}" th:text="${success}"></div>
+
+    <section class="card">
+        <h3>Resident List</h3>
+        <p class="muted">Only approved officials can edit resident details and valid ID.</p>
+
+        <p class="muted" th:if="${#lists.isEmpty(residents)}">No residents found.</p>
+        <div th:if="${!#lists.isEmpty(residents)}">
+            <article class="card" th:each="r : ${residents}">
+                <form method="post" th:action="@{'/residents/' + ${r.id} + '/update'}" enctype="multipart/form-data">
+                    <label>Resident Number</label>
+                    <input name="residentNumber" th:value="${r.residentNumber}">
+
+                    <label>Full Name</label>
+                    <input name="fullName" th:value="${r.fullName}" required>
+
+                    <label>Contact Number</label>
+                    <input name="contactNumber" th:value="${r.contactNumber}">
+
+                    <label>Address</label>
+                    <input name="address" th:value="${r.address}">
+
+                    <label>Current Valid ID</label>
+                    <p class="tiny" th:if="${r.idDocumentPath == null or r.idDocumentPath == ''}">No valid ID uploaded.</p>
+                    <p class="tiny" th:if="${r.idDocumentPath != null and r.idDocumentPath != ''}">
+                        <a th:href="@{'/' + ${r.idDocumentPath}}" target="_blank">View Uploaded ID</a>
+                    </p>
+
+                    <label>Replace Valid ID (JPG/PNG/PDF)</label>
+                    <input type="file" name="idFile" accept=".jpg,.jpeg,.png,.pdf">
+
+                    <label class="tiny">
+                        <input type="checkbox" name="verified" th:checked="${r.verified}">
+                        Mark Valid ID as Verified
+                    </label>
+
+                    <button type="submit">Save Resident</button>
+                </form>
+            </article>
+        </div>
+    </section>
+</main>
+</body>
+</html>

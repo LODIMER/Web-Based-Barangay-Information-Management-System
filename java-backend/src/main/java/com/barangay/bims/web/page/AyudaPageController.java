@@ -91,8 +91,8 @@ public class AyudaPageController {
     ) {
         User user = SessionSupport.currentUserOrNull(session, userRepository);
         if (user == null) return "redirect:/login";
-        if (user.getRole() != Role.OFFICIAL) {
-            ra.addFlashAttribute("error", "Only barangay officials can approve ayuda requests.");
+        if (!SessionSupport.isApprovedOfficial(user)) {
+            ra.addFlashAttribute("error", "Only approved officials can approve ayuda requests.");
             return "redirect:/ayuda/request";
         }
 

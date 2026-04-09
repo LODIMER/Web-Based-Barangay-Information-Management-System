@@ -49,8 +49,8 @@ public class AyudaController {
     @PatchMapping("/{id}/approve")
     public AyudaRequest approve(@PathVariable Long id, HttpSession session) {
         User user = currentUser(session);
-        if (user.getRole() != Role.OFFICIAL) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Official access required");
+        if (user.getRole() != Role.OFFICIAL || !user.isOfficialApproved()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Approved official access required");
         }
 
         AyudaRequest request = ayudaRequestRepository.findById(id)

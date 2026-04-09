@@ -11,11 +11,13 @@
         <span class="brand-text">Barangay Information Management System</span>
     </a>
     <div class="links">
-        <a href="/">Dashboard</a>
+        <a href="/" th:if="${role != 'RESIDENT'}">Dashboard</a>
         <a href="/profile">My Profile</a>
-        <a href="/ayuda/request" th:text="${(role == 'OFFICIAL' or role == 'ADMIN') ? 'Add Ayuda' : 'Request Ayuda'}">Request Ayuda</a>
+        <a href="/ayuda/request" th:text="${role == 'RESIDENT' ? 'Request Ayuda' : 'Add Ayuda'}">Request Ayuda</a>
         <a href="/blotter">Blotter</a>
-        <a href="/schedule" th:if="${role == 'OFFICIAL' or role == 'ADMIN'}">Add Schedule</a>
+        <a href="/schedule" th:if="${canApproveOfficials}">Add Schedule</a>
+        <a href="/residents" th:if="${canApproveOfficials}">Residents</a>
+        <a href="/officials/approvals" th:if="${canApproveOfficials}">Official Approvals</a>
     </div>
     <form method="post" action="/logout">
         <button type="submit">Logout</button>

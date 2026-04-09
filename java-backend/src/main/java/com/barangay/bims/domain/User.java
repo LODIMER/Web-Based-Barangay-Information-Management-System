@@ -38,6 +38,9 @@ public class User {
     @Column(nullable = false, length = 20)
     private Role role = Role.RESIDENT;
 
+    @Column(name = "official_approved", nullable = false)
+    private boolean officialApproved = false;
+
     @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -60,6 +63,8 @@ public class User {
     public void setVerified(boolean verified) { this.verified = verified; }
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
+    public boolean isOfficialApproved() { return officialApproved; }
+    public void setOfficialApproved(boolean officialApproved) { this.officialApproved = officialApproved; }
     public LocalDateTime getCreatedAt() { return createdAt; }
 }
 

@@ -16,7 +16,12 @@
     <section class="card">
         <form method="post" action="/profile" enctype="multipart/form-data">
             <label>Full Name</label>
-            <input name="fullName" th:value="${userProfile.fullName}" required>
+            <input
+                name="fullName"
+                th:value="${userProfile.fullName}"
+                th:readonly="${role == 'RESIDENT'}"
+                required
+            >
 
             <label th:if="${role == 'RESIDENT'}">Resident Number</label>
             <input th:if="${role == 'RESIDENT'}" th:value="${userProfile.residentNumber}" readonly>
@@ -27,13 +32,15 @@
             <label>Address</label>
             <textarea name="address" th:text="${userProfile.address}"></textarea>
 
-            <label>Upload Valid ID (jpg/png/pdf)</label>
-            <input type="file" name="idFile" accept=".jpg,.jpeg,.png,.pdf">
+            <div th:if="${role != 'RESIDENT'}">
+                <label>Upload Valid ID (jpg/png/pdf)</label>
+                <input type="file" name="idFile" accept=".jpg,.jpeg,.png,.pdf">
 
-            <p class="tiny" th:if="${userProfile.idDocumentPath != null}">
-                ID on file: <span th:text="${userProfile.idDocumentPath}"></span>
-            </p>
-            <p class="tiny" th:text="${userProfile.verified} ? 'Verified' : 'Not verified yet'"></p>
+                <p class="tiny" th:if="${userProfile.idDocumentPath != null}">
+                    ID on file: <span th:text="${userProfile.idDocumentPath}"></span>
+                </p>
+                <p class="tiny" th:text="${userProfile.verified} ? 'Verified' : 'Not verified yet'"></p>
+            </div>
 
             <button type="submit">Save Changes</button>
         </form>

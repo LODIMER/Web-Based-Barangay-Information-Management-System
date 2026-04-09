@@ -4,12 +4,12 @@ This is the Java version of the system using Spring Boot + MySQL.
 
 It includes:
 - Resident login and registration
-- Official login and registration
-- Profile update + valid ID upload
+- Official login/registration with approval workflow
+- Profile update + valid ID upload (official-managed)
 - Ayuda requests (official can auto-create schedule)
 - Ayuda requests with `PENDING` -> `APPROVED` flow (official approval only)
 - Schedule page
-- Blotter page (submit report, filter/search, status update for officials/admin)
+- Blotter page (submit report, resident update request, status update for approved officials)
 
 ---
 
@@ -39,17 +39,31 @@ If you already have Java, Maven, and MySQL installed, do this:
 ## How the system works (simple summary)
 
 1. A user registers as **Resident** or **Official**.
-2. User logs in and gets a session (keeps them signed in).
-3. Residents can request ayuda and submit blotter reports.
-4. Ayuda requests are created with `PENDING` status.
-5. Barangay officials can approve ayuda requests (`APPROVED`), and if a preferred date exists, it is synced to schedule.
-6. Officials/admin can update blotter status:
+2. The system ensures a first default approved official exists (seeded at startup if needed).
+3. New official registrations are `pending` and must be approved by an approved official.
+4. User logs in and gets a session (keeps them signed in).
+5. Residents can request ayuda and submit blotter reports.
+6. Residents can request follow-up updates on their own blotter reports.
+7. Ayuda requests are created with `PENDING` status.
+8. Approved barangay officials can approve ayuda requests (`APPROVED`), and if a preferred date exists, it is synced to schedule.
+9. Approved officials can update blotter status:
    - `PENDING`
    - `APPROVED`
    - `RESOLVED`
    - `REJECTED`
 
 Resident accounts automatically get a resident number like `RES-001`.
+
+### Access rules (current)
+
+- **Resident**
+  - Can access: `Blotter`, `Request Ayuda`, `My Profile`.
+  - Profile edit is limited to phone number and address.
+- **Approved Official**
+  - Can approve new official registrations.
+  - Can manage residents (including valid ID review/update).
+  - Can update blotter status and approve ayuda requests.
+  - Can access schedule management pages.
 
 ---
 
@@ -119,6 +133,18 @@ spring.datasource.password=
 
 If your MySQL has a password, put it in `spring.datasource.password`.
 
+### 3.1) (For existing databases) apply migration SQL
+
+If you already have data and want to align schema with latest features, run:
+
+```sql
+SOURCE db_migration_official_resident_updates.sql;
+```
+
+Or copy/run SQL contents from:
+
+`java-backend/db_migration_official_resident_updates.sql`
+
 ### 4) Run the app
 
 ```bash
@@ -142,6 +168,8 @@ When it starts, open:
 - Ayuda form: `http://localhost:8080/ayuda/request`
 - Schedule: `http://localhost:8080/schedule`
 - Blotter: `http://localhost:8080/blotter`
+- Official approvals: `http://localhost:8080/officials/approvals`
+- Resident management: `http://localhost:8080/residents`
 
 ---
 
@@ -159,6 +187,8 @@ When it starts, open:
 - `GET /api/blotter`
 - `POST /api/blotter`
 - `PATCH /api/blotter/{id}/status?status=APPROVED`
+- `PATCH /api/blotter/{id}/request-update?requestMessage=...`
+- `POST /api/auth/officials/{officialId}/approve`
 
 ---
 

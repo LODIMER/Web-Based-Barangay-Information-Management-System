@@ -60,12 +60,13 @@
                     <th>Date</th>
                     <th>Type</th>
                     <th>Status</th>
-                    <th th:if="${isOfficialOrAdmin}">Actions</th>
+                    <th>Resident Update Request</th>
+                    <th th:if="${canApproveOfficials}">Actions</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:if="${#lists.isEmpty(reports)}">
-                    <td th:colspan="${isOfficialOrAdmin} ? 4 : 3">No reports yet.</td>
+                    <td th:colspan="${canApproveOfficials} ? 5 : 4">No reports yet.</td>
                 </tr>
                 <tr th:each="r : ${reports}">
                     <td th:text="${r.incidentDate}">2026-02-01</td>
@@ -74,7 +75,16 @@
                         <div class="tiny" th:text="${r.location}">Location</div>
                     </td>
                     <td th:text="${r.status}">PENDING</td>
-                    <td th:if="${isOfficialOrAdmin}">
+                    <td>
+                        <div class="tiny" th:if="${r.residentUpdateRequest != null and r.residentUpdateRequest != ''}" th:text="${r.residentUpdateRequest}">Request message</div>
+                        <div class="tiny" th:if="${r.residentUpdateRequest == null or r.residentUpdateRequest == ''}">No request</div>
+                        <form th:if="${role == 'RESIDENT'}" method="post" action="/blotter/request-update">
+                            <input type="hidden" name="id" th:value="${r.id}">
+                            <textarea name="requestMessage" placeholder="Request an update for this report..." required></textarea>
+                            <button type="submit">Request Update</button>
+                        </form>
+                    </td>
+                    <td th:if="${canApproveOfficials}">
                         <form method="post" action="/blotter/status" class="inline-form">
                             <input type="hidden" name="id" th:value="${r.id}">
                             <select name="status">

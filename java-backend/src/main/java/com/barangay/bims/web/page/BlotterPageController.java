@@ -1,6 +1,7 @@
 package com.barangay.bims.web.page;
 
 import com.barangay.bims.domain.BlotterReport;
+import com.barangay.bims.domain.Role;
 import com.barangay.bims.domain.User;
 import com.barangay.bims.repo.BlotterReportRepository;
 import com.barangay.bims.repo.UserRepository;
@@ -44,11 +45,21 @@ public class BlotterPageController {
         String keyword = (q == null || q.isBlank()) ? null : q.trim();
         int safePage = Math.max(page, 0);
         int safeSize = Math.min(Math.max(size, 5), 50);
-        Page<BlotterReport> reportPage = blotterRepo.search(
-            normalizedStatus,
-            keyword,
-            PageRequest.of(safePage, safeSize)
-        );
+        Page<BlotterReport> reportPage;
+        if (user.getRole() == Role.RESIDENT) {
+            reportPage = blotterRepo.searchForResident(
+                user.getId(),
+                normalizedStatus,
+                keyword,
+                PageRequest.of(safePage, safeSize)
+            );
+        } else {
+            reportPage = blotterRepo.search(
+                normalizedStatus,
+                keyword,
+                PageRequest.of(safePage, safeSize)
+            );
+        }
 
         model.addAttribute("selectedStatus", normalizedStatus == null ? "ALL" : normalizedStatus);
         model.addAttribute("query", q == null ? "" : q);
@@ -99,8 +110,8 @@ public class BlotterPageController {
         RedirectAttributes ra
     ) {
         User user = SessionSupport.currentUserOrNull(session, userRepository);
-        if (!SessionSupport.isOfficialOrAdmin(user)) {
-            ra.addFlashAttribute("error", "Only officials/admin can update status.");
+        if (!SessionSupport.isApprovedOfficial(user)) {
+            ra.addFlashAttribute("error", "Only approved officials can update blotter status.");
             return "redirect:/blotter";
         }
 
@@ -120,6 +131,36 @@ public class BlotterPageController {
         report.setStatus(normalized);
         blotterRepo.save(report);
         ra.addFlashAttribute("success", "Blotter status updated.");
+        return "redirect:/blotter";
+    }
+
+    @PostMapping("/blotter/request-update")
+    public String requestUpdate(
+        @RequestParam Long id,
+        @RequestParam String requestMessage,
+        HttpSession session,
+        RedirectAttributes ra
+    ) {
+        User user = SessionSupport.currentUserOrNull(session, userRepository);
+        if (user == null) return "redirect:/login";
+        if (user.getRole() != Role.RESIDENT) {
+            ra.addFlashAttribute("error", "Only residents can request blotter updates.");
+            return "redirect:/blotter";
+        }
+        if (requestMessage == null || requestMessage.isBlank()) {
+            ra.addFlashAttribute("error", "Please provide your update request message.");
+            return "redirect:/blotter";
+        }
+
+        BlotterReport report = blotterRepo.findById(id).orElse(null);
+        if (report == null || report.getReportedBy() == null || !report.getReportedBy().getId().equals(user.getId())) {
+            ra.addFlashAttribute("error", "You can only request updates for your own blotter reports.");
+            return "redirect:/blotter";
+        }
+
+        report.setResidentUpdateRequest(requestMessage.trim());
+        blotterRepo.save(report);
+        ra.addFlashAttribute("success", "Update request sent to barangay officials.");
         return "redirect:/blotter";
     }
 

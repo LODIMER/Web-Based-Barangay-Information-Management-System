@@ -8,6 +8,7 @@ import com.barangay.bims.web.dto.AuthDtos.LoginRequest;
 import com.barangay.bims.web.dto.AuthDtos.RegisterRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -61,6 +62,9 @@ public class AuthController {
         if (!roleMatchesSelection(user.getRole(), selectedRole)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Role does not match selected account type");
         }
+        if (user.getRole() == Role.OFFICIAL && !user.isOfficialApproved()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Official account is pending approval");
+        }
 
         session.setAttribute("userId", user.getId());
         session.setAttribute("role", user.getRole().name());
@@ -79,6 +83,27 @@ public class AuthController {
         session.invalidate();
     }
 
+    @PostMapping("/officials/{officialId}/approve")
+    public Map<String, String> approveOfficial(@PathVariable Long officialId, HttpSession session) {
+        User approver = resolveApprover(session);
+        User target = userRepository.findById(officialId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Official not found"));
+
+        if (target.getRole() != Role.OFFICIAL) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only official accounts can be approved");
+        }
+        if (target.isOfficialApproved()) {
+            return Map.of("message", "Official is already approved");
+        }
+        if (approver.getId().equals(target.getId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot approve your own account");
+        }
+
+        target.setOfficialApproved(true);
+        userRepository.save(target);
+        return Map.of("message", "Official approved");
+    }
+
     private AuthResponse registerWithRole(RegisterRequest req, Role role) {
         if (!req.password().equals(req.confirmPassword())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Passwords do not match");
@@ -92,6 +117,7 @@ public class AuthController {
         user.setFullName(req.fullName());
         user.setPassword(passwordEncoder.encode(req.password()));
         user.setRole(role);
+        user.setOfficialApproved(role != Role.OFFICIAL);
 
         User saved = userRepository.save(user);
 
@@ -101,6 +127,20 @@ public class AuthController {
             saved = userRepository.save(saved);
         }
         return new AuthResponse(saved.getId(), saved.getUsername(), saved.getRole().name());
+    }
+
+    private User resolveApprover(HttpSession session) {
+        Object userId = session.getAttribute("userId");
+        if (!(userId instanceof Number numberUserId)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required");
+        }
+        User approver = userRepository.findById(numberUserId.longValue())
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid session"));
+        boolean isApprovedOfficial = approver.getRole() == Role.OFFICIAL && approver.isOfficialApproved();
+        if (!isApprovedOfficial) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only approved officials can approve accounts");
+        }
+        return approver;
     }
 
     private Role normalizeRole(String role) {

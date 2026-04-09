@@ -21,6 +21,7 @@ erDiagram
         VARCHAR id_document_path
         BOOLEAN is_verified
         VARCHAR role
+        BOOLEAN official_approved
         TIMESTAMP created_at
     }
 
@@ -48,6 +49,7 @@ erDiagram
         VARCHAR type
         VARCHAR location
         TEXT details
+        TEXT resident_update_request
         VARCHAR status
         BIGINT reported_by FK
         TIMESTAMP created_at
@@ -63,7 +65,9 @@ erDiagram
 ## Notes
 
 - `role` is stored as string enum values: `RESIDENT`, `OFFICIAL`, `ADMIN`.
+- `official_approved` controls if an official account can login and manage approvals/workflows.
 - `urgency_level` uses enum values: `LOW`, `MEDIUM`, `HIGH`.
 - `ayuda_requests.status` uses values: `PENDING`, `APPROVED`.
 - New resident accounts auto-generate `resident_number` format like `RES-001`.
+- `resident_update_request` lets residents request a follow-up update on their own blotter reports.
 

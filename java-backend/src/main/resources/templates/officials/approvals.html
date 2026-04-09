@@ -3,41 +3,19 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Barangay Information Management System - Dashboard</title>
+    <title>Barangay Information Management System - Official Approvals</title>
     <link rel="stylesheet" href="/css/app.css">
 </head>
 <body>
 <div th:replace="~{fragments/nav :: topnav}"></div>
 <main class="container">
-    <h1>Dashboard</h1>
+    <h1>Official Approvals</h1>
+
     <div class="alert error" th:if="${error}" th:text="${error}"></div>
     <div class="alert success" th:if="${success}" th:text="${success}"></div>
 
-    <section class="grid three" th:if="${!isResident}">
-        <article class="card"><h3>Total Users</h3><p th:text="${userCount}">0</p></article>
-        <article class="card"><h3>Ayuda Requests</h3><p th:text="${ayudaCount}">0</p></article>
-        <article class="card"><h3>Schedules</h3><p th:text="${scheduleCount}">0</p></article>
-    </section>
-
-    <section class="grid two" th:if="${isResident}">
-        <article class="card">
-            <h3>My Calendar</h3>
-            <p class="muted">Upcoming schedule dates are listed in notifications.</p>
-        </article>
-        <article class="card">
-            <h3>Notifications</h3>
-            <ul th:if="${#lists.size(upcoming) > 0}">
-                <li th:each="s : ${upcoming}"
-                    th:text="${s.ayudaRequest.requestType} + ' - ' + ${s.scheduledDate}">
-                    Schedule item
-                </li>
-            </ul>
-            <p class="muted" th:if="${#lists.isEmpty(upcoming)}">No new notifications.</p>
-        </article>
-    </section>
-
-    <section class="card" th:if="${canApproveOfficials}">
-        <h3>Pending Official Approvals</h3>
+    <section class="card">
+        <h3>Pending Official Accounts</h3>
         <p class="muted" th:if="${#lists.isEmpty(pendingOfficials)}">No pending official accounts.</p>
         <table th:if="${!#lists.isEmpty(pendingOfficials)}">
             <thead>
@@ -63,4 +41,3 @@
 </main>
 </body>
 </html>
-

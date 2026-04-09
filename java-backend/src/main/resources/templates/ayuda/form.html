@@ -60,19 +60,19 @@
                 <th>Urgency</th>
                 <th>Preferred Date</th>
                 <th>Status</th>
-                <th th:if="${role == 'OFFICIAL'}">Action</th>
+                <th th:if="${canApproveOfficials}">Action</th>
             </tr>
             </thead>
             <tbody>
             <tr th:if="${#lists.isEmpty(requests)}">
-                <td th:colspan="${role == 'OFFICIAL'} ? 5 : 4">No ayuda requests yet.</td>
+                <td th:colspan="${canApproveOfficials} ? 5 : 4">No ayuda requests yet.</td>
             </tr>
             <tr th:each="r : ${requests}">
                 <td th:text="${r.requestType}">Request Type</td>
                 <td th:text="${r.urgencyLevel}">MEDIUM</td>
                 <td th:text="${r.preferredDate != null ? r.preferredDate : '-'}">-</td>
                 <td th:text="${r.status}">PENDING</td>
-                <td th:if="${role == 'OFFICIAL'}">
+                <td th:if="${canApproveOfficials}">
                     <form method="post" action="/ayuda/approve" class="inline-form">
                         <input type="hidden" name="id" th:value="${r.id}">
                         <button type="submit" th:disabled="${r.status == 'APPROVED'}">Approve</button>

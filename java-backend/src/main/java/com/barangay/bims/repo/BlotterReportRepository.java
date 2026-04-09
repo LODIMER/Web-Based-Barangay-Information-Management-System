@@ -27,5 +27,25 @@ public interface BlotterReportRepository extends JpaRepository<BlotterReport, Lo
         @Param("keyword") String keyword,
         Pageable pageable
     );
+
+    @Query("""
+        SELECT b FROM BlotterReport b
+        WHERE b.reportedBy.id = :reportedById
+          AND (:status IS NULL OR b.status = :status)
+          AND (
+              :keyword IS NULL OR
+              LOWER(b.type) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+              LOWER(b.location) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+              LOWER(b.details) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+              LOWER(COALESCE(b.residentUpdateRequest, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
+          )
+        ORDER BY b.createdAt DESC
+        """)
+    Page<BlotterReport> searchForResident(
+        @Param("reportedById") Long reportedById,
+        @Param("status") String status,
+        @Param("keyword") String keyword,
+        Pageable pageable
+    );
 }
 

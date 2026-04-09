@@ -28,10 +28,15 @@ public final class SessionSupport {
         model.addAttribute("currentUser", user);
         model.addAttribute("role", user == null ? "GUEST" : user.getRole().name());
         model.addAttribute("isOfficialOrAdmin", user != null && (user.getRole() == Role.OFFICIAL || user.getRole() == Role.ADMIN));
+        model.addAttribute("canApproveOfficials", isApprovedOfficial(user));
     }
 
     public static boolean isOfficialOrAdmin(User user) {
         return user != null && (user.getRole() == Role.OFFICIAL || user.getRole() == Role.ADMIN);
+    }
+
+    public static boolean isApprovedOfficial(User user) {
+        return user != null && user.getRole() == Role.OFFICIAL && user.isOfficialApproved();
     }
 }
 

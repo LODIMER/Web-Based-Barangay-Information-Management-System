@@ -51,6 +51,10 @@ public class AuthPageController {
             ra.addFlashAttribute("error", "Account type does not match your selection.");
             return "redirect:/login";
         }
+        if (user.getRole() == Role.OFFICIAL && !user.isOfficialApproved()) {
+            ra.addFlashAttribute("error", "Official account is pending approval by an approved official.");
+            return "redirect:/login";
+        }
 
         session.setAttribute("userId", user.getId());
         session.setAttribute("role", user.getRole().name());
@@ -96,6 +100,7 @@ public class AuthPageController {
         user.setFullName(fullName);
         user.setPassword(passwordEncoder.encode(password));
         user.setRole("OFFICIAL".equals(selectedRole) ? Role.OFFICIAL : Role.RESIDENT);
+        user.setOfficialApproved(!"OFFICIAL".equals(selectedRole));
         user = userRepository.save(user);
 
         if ("RESIDENT".equals(selectedRole)) {
@@ -103,7 +108,11 @@ public class AuthPageController {
             userRepository.save(user);
         }
 
-        ra.addFlashAttribute("success", "Account created. Please login.");
+        if ("OFFICIAL".equals(selectedRole)) {
+            ra.addFlashAttribute("success", "Official account created and pending approval by an approved official.");
+        } else {
+            ra.addFlashAttribute("success", "Account created. Please login.");
+        }
         return "redirect:/login";
     }
 

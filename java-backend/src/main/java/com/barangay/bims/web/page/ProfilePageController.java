@@ -1,6 +1,7 @@
 package com.barangay.bims.web.page;
 
 import com.barangay.bims.domain.User;
+import com.barangay.bims.domain.Role;
 import com.barangay.bims.repo.UserRepository;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
@@ -35,7 +36,7 @@ public class ProfilePageController {
 
     @PostMapping("/profile")
     public String update(
-        @RequestParam String fullName,
+        @RequestParam(required = false) String fullName,
         @RequestParam(required = false) String contactNumber,
         @RequestParam(required = false) String address,
         @RequestParam(name = "idFile", required = false) MultipartFile idFile,
@@ -45,9 +46,20 @@ public class ProfilePageController {
         User user = SessionSupport.currentUserOrNull(session, userRepository);
         if (user == null) return "redirect:/login";
 
-        user.setFullName(fullName);
+        if (user.getRole() != Role.RESIDENT) {
+            if (fullName == null || fullName.isBlank()) {
+                ra.addFlashAttribute("error", "Full name is required.");
+                return "redirect:/profile";
+            }
+            user.setFullName(fullName);
+        }
         user.setContactNumber(contactNumber);
         user.setAddress(address);
+
+        if (user.getRole() == Role.RESIDENT && idFile != null && !idFile.isEmpty()) {
+            ra.addFlashAttribute("error", "Residents can only update phone number and address.");
+            return "redirect:/profile";
+        }
 
         if (idFile != null && !idFile.isEmpty()) {
             String original = idFile.getOriginalFilename() == null ? "" : idFile.getOriginalFilename();
